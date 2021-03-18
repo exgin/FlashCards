@@ -43,8 +43,8 @@ public class FlashcardDAOImpl implements FlashcardDAO {
     @Override
     public void deleteById(Integer id) {
         Session currSession = entityManager.unwrap(Session.class);
-        Query query = currSession.createQuery("DELETE FROM Flashcard WHERE id=:id");
-        query.setParameter("id", id);
+        Query query = currSession.createQuery("delete from Flashcard where id=:flashcardId");
+        query.setParameter("flashcardId", id);
         query.executeUpdate();
     }
 }

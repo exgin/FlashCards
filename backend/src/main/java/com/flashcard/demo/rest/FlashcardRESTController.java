@@ -3,16 +3,13 @@ package com.flashcard.demo.rest;
 import com.flashcard.demo.flashcard.entity.Flashcard;
 import com.flashcard.demo.flashcard.service.FlashcardService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 //@CrossOrigin(origins = { "http://localhost:3000"})
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/flashcards")
 public class FlashcardRESTController {
 
     private FlashcardService flashcardService;
@@ -24,10 +21,43 @@ public class FlashcardRESTController {
     }
 
     // get all flashcards
-    @GetMapping("/flashcards")
+    @GetMapping("/")
     public List<Flashcard> getAll() {
         return flashcardService.getAll();
     }
 
+    // get a specific flashcard
+    @GetMapping("/{id}")
+    public Flashcard getById(@PathVariable Integer id) {
+        return flashcardService.getById(id);
+    }
 
+    // TODO: 3/17/2021 1) finish amgiosCode video | 2) make react make api calls to this (have to be auth'd)
+    // create a new flashcard | MUST DISABLE csrf
+    @PostMapping("/")
+    public Flashcard addFlashcard(@RequestBody Flashcard fc) {
+        fc.setId(0); // force saves & auto increments ID
+        flashcardService.save(fc);
+        return fc;
+    }
+
+    // update any flashcard
+    @PutMapping("/")
+    public Flashcard updateFlashcard(@RequestBody Flashcard fc) {
+        flashcardService.save(fc);
+        return fc;
+    }
+
+    // delete any flashcard
+    @DeleteMapping("/{id}")
+    public String deleteFlashcard(@PathVariable Integer id) {
+        Flashcard fc = flashcardService.getById(id);
+        System.out.println("found ID:" + fc);
+        if (fc == null) {
+            throw new IllegalStateException(id + " was not found, thus not deleted");
+        }
+
+        flashcardService.deleteById(id);
+        return "Flashcard with id " + id + " was removed.";
+    }
 }

@@ -27,6 +27,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // antMatchers() white list files that anyone can see
         http
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/","index","/css/*,/js/*,/jsx/*")
                 .permitAll()

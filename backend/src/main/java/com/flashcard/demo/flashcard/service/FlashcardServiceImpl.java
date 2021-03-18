@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
-@Service // needed to be explicit so we know its a service componenet
+@Service // needed to be explicit so we know its a service component
 public class FlashcardServiceImpl implements FlashcardService {
 
     private FlashcardDAO flashcardDAO; // implement DAO in the service
@@ -40,6 +40,7 @@ public class FlashcardServiceImpl implements FlashcardService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Integer id) {
         flashcardDAO.deleteById(id);
     }

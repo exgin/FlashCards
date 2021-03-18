@@ -26,6 +26,10 @@ public class Flashcard {
         this.answer = answer;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }
