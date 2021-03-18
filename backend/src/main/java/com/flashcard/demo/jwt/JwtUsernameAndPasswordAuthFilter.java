@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,9 +21,14 @@ import java.util.Date;
 public class JwtUsernameAndPasswordAuthFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
 
-    public JwtUsernameAndPasswordAuthFilter(AuthenticationManager authenticationManager) {
+    public JwtUsernameAndPasswordAuthFilter(AuthenticationManager authenticationManager, SecretKey secretKey,
+                                            JwtConfig jwtConfig) {
         this.authenticationManager = authenticationManager;
+        this.secretKey = secretKey;
+        this.jwtConfig = jwtConfig;
     }
 
     @Override
@@ -57,9 +63,9 @@ public class JwtUsernameAndPasswordAuthFilter extends UsernamePasswordAuthentica
                 .claim("authorities",authResult.getAuthorities())
                 .setIssuedAt(new Date())
                 .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusWeeks(2)))
-                .signWith(Keys.hmacShaKeyFor("securesecuresecuresecuresecuresecure".getBytes()))
+                .signWith(secretKey)
                 .compact();
 
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader(jwtConfig.getAuthHeader(), jwtConfig.getTokenPrefix() + token);
     }
 }

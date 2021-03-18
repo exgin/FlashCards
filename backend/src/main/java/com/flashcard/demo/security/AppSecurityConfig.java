@@ -1,5 +1,6 @@
 package com.flashcard.demo.security;
 
+import com.flashcard.demo.jwt.JwtConfig;
 import com.flashcard.demo.jwt.JwtTokenVerifier;
 import com.flashcard.demo.jwt.JwtUsernameAndPasswordAuthFilter;
 import com.flashcard.demo.user.UserService;
@@ -15,6 +16,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.crypto.SecretKey;
+
 import static com.flashcard.demo.security.AppUserPermission.*;
 import static com.flashcard.demo.security.AppUserRole.*;
 
@@ -24,11 +27,15 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
 
     @Autowired
-    public AppSecurityConfig(PasswordEncoder passwordEncoder, UserService userService) {
+    public AppSecurityConfig(PasswordEncoder passwordEncoder, UserService userService, SecretKey secretKey, JwtConfig jwtConfig) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
+        this.secretKey = secretKey;
+        this.jwtConfig = jwtConfig;
     }
 
     @Override
@@ -40,8 +47,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthFilter(authenticationManager()))
-                .addFilterAfter(new JwtTokenVerifier(), JwtUsernameAndPasswordAuthFilter.class)
+                .addFilter(new JwtUsernameAndPasswordAuthFilter(authenticationManager(), secretKey, jwtConfig))
+                .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthFilter.class)
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/**").hasAuthority(CARD_WRITE.getPermission())
                 .antMatchers(HttpMethod.DELETE, "/api/**").hasAuthority(CARD_WRITE.getPermission())

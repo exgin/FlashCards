@@ -3,12 +3,11 @@ package com.flashcard.demo.rest;
 import com.flashcard.demo.flashcard.entity.Flashcard;
 import com.flashcard.demo.flashcard.service.FlashcardService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
+
+
 
 //@CrossOrigin(origins = { "http://localhost:3000"})
 @RestController
@@ -22,14 +21,6 @@ public class FlashcardRESTController {
     public FlashcardRESTController(FlashcardService flashcardService) {
         this.flashcardService = flashcardService;
     }
-
-    // csrf token method
-//    @GetMapping(value="/csrf-token")
-//    public @ResponseBody
-//    Map<String, String> getCsrfToken(HttpServletRequest request) {
-//        CsrfToken token = (CsrfToken)request.getAttribute(CsrfToken.class.getName());
-//        return Map.of("token", token.getToken(),"parameterName", token.getParameterName(), "headerName", token.getHeaderName());
-//    }
 
     // get all flashcards
     @GetMapping("/")
