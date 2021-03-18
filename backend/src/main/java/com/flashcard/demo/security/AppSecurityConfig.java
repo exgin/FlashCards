@@ -1,17 +1,19 @@
 package com.flashcard.demo.security;
 
+import com.flashcard.demo.jwt.JwtTokenVerifier;
+import com.flashcard.demo.jwt.JwtUsernameAndPasswordAuthFilter;
+import com.flashcard.demo.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import static com.flashcard.demo.security.AppUserPermission.*;
 import static com.flashcard.demo.security.AppUserRole.*;
@@ -21,19 +23,25 @@ import static com.flashcard.demo.security.AppUserRole.*;
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     @Autowired
-    public AppSecurityConfig(PasswordEncoder passwordEncoder) {
+    public AppSecurityConfig(PasswordEncoder passwordEncoder, UserService userService) {
         this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // antMatchers() white list files that anyone can see
         // add authority to creating flashcards
-        // RIGHT NOW ONLY ADMINS CAN SEE CARDS
+
         http
                 .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilter(new JwtUsernameAndPasswordAuthFilter(authenticationManager()))
+                .addFilterAfter(new JwtTokenVerifier(), JwtUsernameAndPasswordAuthFilter.class)
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/**").hasAuthority(CARD_WRITE.getPermission())
                 .antMatchers(HttpMethod.DELETE, "/api/**").hasAuthority(CARD_WRITE.getPermission())
@@ -42,29 +50,21 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/","index","/css/*,/js/*,/jsx/*")
                 .permitAll()
                 .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic();
+                .authenticated();
     }
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProvider());
+    }
+
     @Bean
-    protected UserDetailsService userDetailsService() {
-        UserDetails billy = User.builder()
-                .username("bill") // username
-                .password(passwordEncoder.encode("billy1")) // password
-//                .roles(AppUserRole.NORMAL.name()) // normal_role
-                .authorities(NORMAL.getGrantedAuthorities())
-                .build();
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(userService);
 
-        UserDetails sam = User.builder()
-                .username("sam")
-                .password(passwordEncoder.encode("sam1"))
-//                .roles(AppUserRole.ADMIN.name()) // admin
-                .authorities(ADMIN.getGrantedAuthorities())
-                .build();
-
-        return new InMemoryUserDetailsManager(billy, sam);
+        return provider;
     }
 
 }

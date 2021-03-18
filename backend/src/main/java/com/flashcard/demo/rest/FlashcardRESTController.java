@@ -3,9 +3,12 @@ package com.flashcard.demo.rest;
 import com.flashcard.demo.flashcard.entity.Flashcard;
 import com.flashcard.demo.flashcard.service.FlashcardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 //@CrossOrigin(origins = { "http://localhost:3000"})
 @RestController
@@ -20,6 +23,14 @@ public class FlashcardRESTController {
         this.flashcardService = flashcardService;
     }
 
+    // csrf token method
+//    @GetMapping(value="/csrf-token")
+//    public @ResponseBody
+//    Map<String, String> getCsrfToken(HttpServletRequest request) {
+//        CsrfToken token = (CsrfToken)request.getAttribute(CsrfToken.class.getName());
+//        return Map.of("token", token.getToken(),"parameterName", token.getParameterName(), "headerName", token.getHeaderName());
+//    }
+
     // get all flashcards
     @GetMapping("/")
     public List<Flashcard> getAll() {
@@ -32,7 +43,6 @@ public class FlashcardRESTController {
         return flashcardService.getById(id);
     }
 
-    // TODO: 3/17/2021 1) finish amgiosCode video | 2) make react make api calls to this (have to be auth'd)
     // create a new flashcard | MUST DISABLE csrf
     @PostMapping("/admin/")
     public Flashcard addFlashcard(@RequestBody Flashcard fc) {
