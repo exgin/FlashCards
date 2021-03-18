@@ -1,8 +1,6 @@
 package com.flashcard.demo.security;
 
 public enum AppUserPermission {
-    NORMAL_READ("normal:read"),
-    NORMAL_WRITE("normal:write"),
     CARD_READ("card:read"),
     CARD_WRITE("card:write");
 

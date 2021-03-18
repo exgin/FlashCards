@@ -34,7 +34,7 @@ public class FlashcardRESTController {
 
     // TODO: 3/17/2021 1) finish amgiosCode video | 2) make react make api calls to this (have to be auth'd)
     // create a new flashcard | MUST DISABLE csrf
-    @PostMapping("/")
+    @PostMapping("/admin/")
     public Flashcard addFlashcard(@RequestBody Flashcard fc) {
         fc.setId(0); // force saves & auto increments ID
         flashcardService.save(fc);
@@ -42,14 +42,14 @@ public class FlashcardRESTController {
     }
 
     // update any flashcard
-    @PutMapping("/")
+    @PutMapping("/admin/")
     public Flashcard updateFlashcard(@RequestBody Flashcard fc) {
         flashcardService.save(fc);
         return fc;
     }
 
     // delete any flashcard
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/{id}")
     public String deleteFlashcard(@PathVariable Integer id) {
         Flashcard fc = flashcardService.getById(id);
         System.out.println("found ID:" + fc);
