@@ -1,21 +1,45 @@
-package com.flashcard.demo.user;
+package com.flashcard.demo.user.entity;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.Set;
 
-
+@Entity
+@Table(name="users")
 public class User implements UserDetails {
 
-    private final String username;
-    private final String password;
-    private final Set<? extends GrantedAuthority> grantedAuthorities;
-    private final boolean isAccountNonExpired;
-    private final boolean isAccountNonLocked;
-    private final boolean isCredentialsNonExpired;
-    private final boolean isEnabled;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
+    private Long id;
+
+    @Column(name="username")
+    private String username;
+
+    @Column(name="password")
+    private String password;
+
+    @Column(name="is_acc_expired")
+    private boolean isAccountNonExpired;
+
+    @Column(name="is_locked")
+    private boolean isAccountNonLocked;
+
+    @Column(name="is_cred_expired")
+    private boolean isCredentialsNonExpired;
+
+    @Column(name="is_enabled")
+    private boolean isEnabled;
+
+    @Column(name="authorities")
+    @ElementCollection(targetClass = GrantedAuthority.class)
+    private Set<? extends GrantedAuthority> grantedAuthorities;
+
+    public User() {
+    }
 
     public User(String username,
                 String password,
@@ -67,4 +91,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return isEnabled;
     }
+
 }

@@ -21,14 +21,9 @@ import java.util.Date;
 public class JwtUsernameAndPasswordAuthFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-    private final SecretKey secretKey;
-    private final JwtConfig jwtConfig;
 
-    public JwtUsernameAndPasswordAuthFilter(AuthenticationManager authenticationManager, SecretKey secretKey,
-                                            JwtConfig jwtConfig) {
+    public JwtUsernameAndPasswordAuthFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
-        this.secretKey = secretKey;
-        this.jwtConfig = jwtConfig;
     }
 
     @Override
@@ -57,15 +52,16 @@ public class JwtUsernameAndPasswordAuthFilter extends UsernamePasswordAuthentica
                                             FilterChain chain,
                                             Authentication authResult)
             throws IOException, ServletException {
+        String key = "securesecuresecuresecuresecuresecure";
 
         String token = Jwts.builder()
                 .setSubject(authResult.getName())
                 .claim("authorities",authResult.getAuthorities())
                 .setIssuedAt(new Date())
                 .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusWeeks(2)))
-                .signWith(secretKey)
+                .signWith(Keys.hmacShaKeyFor(key.getBytes()))
                 .compact();
 
-        response.addHeader(jwtConfig.getAuthHeader(), jwtConfig.getTokenPrefix() + token);
+        response.addHeader("Authorization", "Bearer " + token);
     }
 }

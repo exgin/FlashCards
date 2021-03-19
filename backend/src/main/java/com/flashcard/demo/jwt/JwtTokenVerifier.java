@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,30 +25,26 @@ import java.util.stream.Collectors;
 // every request, test if the token is valid
 public class JwtTokenVerifier extends OncePerRequestFilter {
 
-    private final SecretKey secretKey;
-    private final JwtConfig jwtConfig;
-
-    public JwtTokenVerifier(SecretKey secretKey, JwtConfig jwtConfig) {
-        this.secretKey = secretKey;
-        this.jwtConfig = jwtConfig;
+    public JwtTokenVerifier() {
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest req,
                                     HttpServletResponse res,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = req.getHeader(jwtConfig.getAuthHeader());
+        String authorizationHeader = req.getHeader("Authorization");
 
         // reject request if invalid
-        if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())) {
+        if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(req, res);
             return;
         }
-        String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
+        String token = authorizationHeader.replace("Bearer ", "");
 
         try {
+            String key = "securesecuresecuresecuresecuresecure";
 
-            Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(secretKey)
+            Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(key.getBytes())
                     .build()
                     .parseClaimsJws(token);
 

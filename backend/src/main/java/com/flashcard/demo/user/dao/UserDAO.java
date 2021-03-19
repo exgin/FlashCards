@@ -1,4 +1,6 @@
-package com.flashcard.demo.user;
+package com.flashcard.demo.user.dao;
+
+import com.flashcard.demo.user.entity.User;
 
 import java.util.List;
 import java.util.Optional;

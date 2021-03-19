@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
+// TODO: 3/18/2021 1. setup a real database for users | 2. setup atleast some frontend react
 
 //@CrossOrigin(origins = { "http://localhost:3000"})
 @RestController
